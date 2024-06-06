@@ -1,7 +1,11 @@
 from flask import Flask, render_template
 from flask_login import login_user
+from flask_sqlalchemy import SQLAlchemy
 
-app = Flask(__name__)
+from models import Subject, Article, Exercise, User
+from __init__ import create_app, db
+
+app = create_app()
 
 
 @app.route('/')
@@ -11,7 +15,23 @@ def home():
 
 @app.route('/library')
 def library():
-    return
+
+    # Создаем объекты моделей данных
+    subject1 = Subject(name='Subject 1')
+    article1 = Article(name='Article 1', subject=subject1)
+    exercise1 = Exercise(article=article1, text='Exercise 1')
+    user1 = User(username='user1', email='user1@example.com',
+                 password_hash='hashed_password', is_admin=True)
+
+    # Добавляем объекты в сессию
+    db.session.add(subject1)
+    db.session.add(article1)
+    db.session.add(exercise1)
+    db.session.add(user1)
+
+    # Зафиксируем изменения
+    db.session.commit()
+    return 'good'
 
 
 @app.route('/library/<subject>')
