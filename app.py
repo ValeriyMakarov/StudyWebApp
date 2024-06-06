@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, url_for, redirect
 from flask_login import login_user
 from flask_sqlalchemy import SQLAlchemy
 
@@ -15,21 +15,9 @@ def home():
 
 @app.route('/library')
 def library():
-
-    # Создаем объекты моделей данных
-    subject1 = Subject(name='Subject 1')
-    article1 = Article(name='Article 1', subject=subject1)
-    exercise1 = Exercise(article=article1, text='Exercise 1')
-    user1 = User(username='user1', email='user1@example.com',
-                 password_hash='hashed_password', is_admin=True)
-
-    # Добавляем объекты в сессию
-    db.session.add(subject1)
-    db.session.add(article1)
-    db.session.add(exercise1)
+    user1 = User(username='admin', email='user1@example.com',
+                 password_hash='admin', is_admin=True)
     db.session.add(user1)
-
-    # Зафиксируем изменения
     db.session.commit()
     return 'good'
 
@@ -51,13 +39,20 @@ def calculators():
 
 @app.route('/calculators/<int:calc_id>')
 def calculator_item(calc_id: int):
-    return
+    return '<h1>fdsfs</h1>'
 
 
-@app.route('/authorization')
+@app.route('/authorization', methods=['GET', 'POST'])
 def authorization():
-    d = {'a':'as', 'b':'asd', 'f':'sdf'}
-    return render_template('test.html', title = 'adsd', list = d)
+    if request.method == 'GET':
+        return render_template(
+            'authorization.html', title='Авторизация', css_file='styles.css'
+        )
+    elif request.method == 'POST':
+        username = request.form.get('login')
+        password = request.form.get('password')
+        user = User.query.filter_by(username=username, password_hash=password).first()
+        return redirect(url_for('home'))
 
 
 if __name__ == '__main__':

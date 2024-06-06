@@ -12,7 +12,6 @@ def create_app():
     db.init_app(app)
 
     with app.app_context():
-        print(app.instance_path)
         if not os.path.exists(os.path.join(app.instance_path, DB_NAME)):
             db.create_all()
             print('Done')
